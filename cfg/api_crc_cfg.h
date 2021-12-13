@@ -30,6 +30,7 @@
 //------------------------------------------------------------------------------
 // Preprocessor
 //------------------------------------------------------------------------------
+#define NULL 0
 
 //****************** Set options and details of include files ******************
 #define BUILD_FOR_PERFORM 0	//!< Macro for optimization of build CRC library for high performance
@@ -37,7 +38,7 @@
 #define BUILD_FOR_DATA 2	//!< Macro for optimization of build CRC library for small data
 
 // Activate just one of the following 3 statements: BUILD_FOR_PERFORM, BUILD_FOR_SIZE, BUILD_FOR_DATA
-#define OPTIMIZE BUILD_FOR_PERFORM
+//#define OPTIMIZE BUILD_FOR_PERFORM
 
 //! Define target platform: x86_64 or x86_32, or 16-bit, or 8-bit.
 //! Activate just one of the following 4 statements:
@@ -77,20 +78,16 @@
 //------------------------------------------------------------------------------
 
 #if defined( PLATFORM_X86_64 )
-// Processor x86 64-bit
-typedef uint64_t api_crc_register_t;
+typedef uint64_t api_crc_register_t;	//!< CPU x86_64 (64-bit)
 
 #elif defined( PLATFORM_X86_32 )
-//! Processor x86 32-bit
-typedef uint32_t api_crc_register_t;
+typedef uint32_t api_crc_register_t;	//!< CPU x86_32 (32-bit)
 
 #elif defined( PLATFORM_X86_16 )
-// Processor 16-bit
-typedef uint16_t api_crc_register_t;
+typedef uint16_t api_crc_register_t;	//!< CPU 16-bit
 
 #elif defined( PLATFORM_X86_8 )
-// Processor 8-bit
-typedef uint8_t api_crc_register_t;
+typedef uint8_t api_crc_register_t;		//!< CPU 8-bit
 
 #endif // PLATFORM_X86
 
