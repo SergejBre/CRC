@@ -171,6 +171,20 @@ ln    -s -f libCRC_generic_dynamic.so.1.0.1 libCRC_generic_dynamic.so
 rm    -f api_crc.o api_crc_process.o
 LINK_LIB_DIN="-L../lib -lCRC_generic_dynamic -Wl,-rpath,../lib"
 
+#build tests
+echo  "Compile and build the Tests"
+echo  "build CRC_static_tests"
+echo  "build CRC_dynamic_tests"
+echo  "build CRC_profiling"
+echo  ""
+cd    ..
+cd    tst
+gcc   -c $CFLAGS tests.c
+gcc   -o CRC_static_tests tests.o $LINK_LIB_STAT
+gcc   -o CRC_dynamic_tests tests.o $LINK_LIB_DIN
+gcc   tests.c -pg -o CRC_profiling -pipe -Os -Wall -W -fPIE $LINK_LIB_STAT
+rm    tests.o
+
 cd    ..
 
 exit 0

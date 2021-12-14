@@ -50,3 +50,18 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# CRC-Generic Project-related
+doc/html
+doc/latex
+doc/figures
+tst/CRC_dynamic_tests
+tst/CRC_static_tests
+tst/CRC_profiling
+tst/gmon.out
+tut/CRC_generic_examples*
+tut/examples*.bin
+*.pro
+*.pro.user
+*Makefile
+*Makefile.*
