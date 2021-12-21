@@ -1,7 +1,7 @@
 # CRC Generic library
 <p align="center">
 	<a href="https://gcc.gnu.org/" rel="nofollow">
-		<img alt="Platform (GNU/GCC)" src="https://img.shields.io/badge/platform-GNU/GCC-blue.svg"/>
+		<img alt="Platform GNU/GCC" src="https://img.shields.io/badge/platform-GNU/GCC-blue.svg"/>
 	</a>
 	<a href="https://osdn.net/projects/mingw/" rel="nofollow">
 		<img alt="Platform MinGW" src="https://img.shields.io/badge/platform-MinGW-green.svg"/>
@@ -19,8 +19,8 @@
 		<img alt="Docs Doxygen" src="https://img.shields.io/badge/docs-Doxygen-blue.svg"/>
 	</a>
 	<a href="https://github.com/SergejBre/CRC/blob/main/LICENSE">
-    <img alt="Docs Doxygen" src="https://img.shields.io/github/license/SergejBre/CRC.svg"/>
-  </a>
+		<img alt="License" src="https://img.shields.io/github/license/SergejBre/CRC.svg"/>
+	</a>
 </p>
 
 The CRC Generic library is designed as a universal solution for most practical CRC methods and provides a flexible API for communication application developers.
