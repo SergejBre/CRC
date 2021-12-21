@@ -53,8 +53,8 @@
 //! Bit order for processing data bytes and storing the CRC checksum.
 typedef enum
 {
-    API_CRC_ORDER_LEAST_SIGNIFICANT_BIT_TO_MOST_SIGNIFICANT_BIT = 0, //! Bytes are processed / filled beginning with the Least Significant Bit (LSB).
-    API_CRC_ORDER_MOST_SIGNIFICANT_BIT_TO_LEAST_SIGNIFICANT_BIT = 1, //! Bytes are processed / filled beginning with the Most Significant Bit (MSB).
+    API_CRC_ORDER_LEAST_SIGNIFICANT_BIT_TO_MOST_SIGNIFICANT_BIT = 0, //!< Bytes are processed / filled beginning with the Least Significant Bit (LSB).
+    API_CRC_ORDER_MOST_SIGNIFICANT_BIT_TO_LEAST_SIGNIFICANT_BIT = 1, //!< Bytes are processed / filled beginning with the Most Significant Bit (MSB).
 } api_crc_order_e;
 
 //! \enum api_crc_status_e

@@ -59,6 +59,7 @@ echo "               2) Selection of the macro -D OPTIMIZE for:"
 echo "                  performance =BUILD_FOR_PERFORM"
 echo "                  code size =BUILD_FOR_SIZE"
 echo "                  data size =BUILD_FOR_DATA"
+echo "                  debug =BUILD_FOR_DEBUG"
 echo ""
 
 
@@ -108,6 +109,9 @@ fi
 #gss FLAGS for Optimization of Performance
 CFLAGS="-pipe -O2 -Wall -W -fPIE -DOPTIMIZE=BUILD_FOR_PERFORM"
 
+#gss FLAGS for Debug build of CRC library
+#CFLAGS="-pipe -g -Wall -W -fPIC -DOPTIMIZE=BUILD_FOR_DEBUG"
+
 #gcc FLAGS for Profiling gprof
 #CFLAGS="-pg -funroll-loops -fmodulo-sched -O2 -Wall -W"
 #CFLAGS="-pg -pipe -Os -Wall -W -fPIE"
@@ -145,6 +149,10 @@ case $CFLAGS in
      echo BUILD_FOR_DATA
 	 ar    rcs libCRC_generic_static.a api_crc.o
      ;;
+    *BUILD_FOR_DEBUG*)
+     echo BUILD_FOR_DEBUG
+	 ar    rcs libCRC_generic_static.a api_crc.o
+     ;;
 esac
 LINK_LIB_STAT="-L../lib -lCRC_generic_static"
 
@@ -163,6 +171,9 @@ case $CFLAGS in
 	 gcc   -shared -Wl,-soname,libCRC_generic_dynamic.so.1 -o libCRC_generic_dynamic.so.1.0.1 api_crc.o
 	 ;;
     *BUILD_FOR_DATA*)
+	 gcc   -shared -Wl,-soname,libCRC_generic_dynamic.so.1 -o libCRC_generic_dynamic.so.1.0.1 api_crc.o
+     ;;
+    *BUILD_FOR_DEBUG*)
 	 gcc   -shared -Wl,-soname,libCRC_generic_dynamic.so.1 -o libCRC_generic_dynamic.so.1.0.1 api_crc.o
      ;;
 esac

@@ -36,6 +36,7 @@
 #define BUILD_FOR_PERFORM 0	//!< Macro for optimization of build CRC library for high performance
 #define BUILD_FOR_SIZE 1	//!< Macro for optimization of build CRC library for small size
 #define BUILD_FOR_DATA 2	//!< Macro for optimization of build CRC library for small data
+#define BUILD_FOR_DEBUG 3	//!< Macro for debug build of CRC library
 
 // Activate just one of the following 3 statements: BUILD_FOR_PERFORM, BUILD_FOR_SIZE, BUILD_FOR_DATA
 //#define OPTIMIZE BUILD_FOR_PERFORM
