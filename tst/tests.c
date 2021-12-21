@@ -221,7 +221,7 @@ int main(void)
     printf("Size of buffer in Bits = %d\n", buffer_size);
     if ((api_crc_process(&device, &state, bufferTest, offset, buffer_size) == API_CRC_STATUS_SUCCESS)
             // Aufpassen! Indexüberlauf bringt keine Meldung.
-            & (api_crc_process(&device, &state, bufferTest, offset, buffer_size + 16) == API_CRC_STATUS_SUCCESS)
+//            & (api_crc_process(&device, &state, bufferTest, offset, buffer_size + 16) == API_CRC_STATUS_SUCCESS)
             & (api_crc_process(&device, &state, 0U, offset, 0UL) == API_CRC_STATUS_INVALID_PARAMETER)
             & (api_crc_process(&device, &state, 0U, offset, 8) == API_CRC_STATUS_INVALID_PARAMETER)
             & (api_crc_process(0U, &state, bufferTest, offset, buffer_size) == API_CRC_STATUS_INVALID_PARAMETER)
@@ -565,26 +565,16 @@ int main(void)
     //------------------------------------------------------------------------------
     // Block 3.
     //------------------------------------------------------------------------------
-    FILE *file = 0;
-    uint8_t ARR[1966080], v;
-    uint32_t n = 0U;
-    file = fopen("testCRC-32.txt","r");
-    if (!file)
+    uint32_t n, N = 1966080U;
+    uint8_t ARR[N];
+
+    for (n = 0U; n < N; n++)
     {
-        printf("The file testCRC-32.txt was not found.\n");
-        return 1;
-    }
-    else
-    {
-        while(fscanf(file, "%c", &v) == 1)
-        {
-            ARR[n++] = v;
-        }
-        fclose(file);
-    }
-    buffer_size = (sizeof(ARR)/sizeof(uint8_t));
-    printf("Value of array[] in bytes %d\n", buffer_size);
-    buffer_size *= 8;
+		ARR[n] = 0x30 + n%10;
+	}
+
+//    printf("Value of array[] in bytes %d\n", n);
+    buffer_size = (n << 3);
     clock_t clockStart, clockEnd;
     double clockElapsedSeconds;
 
@@ -644,9 +634,9 @@ int main(void)
 
     output_Check(crc_Value, &state);
 
-    clockElapsedSeconds = (double) (clockEnd - clockStart) / CLOCKS_PER_SEC;
+    clockElapsedSeconds = ((double)(clockEnd - clockStart)) / CLOCKS_PER_SEC;
     printf("Processing for %d bits took %f seconds\n", buffer_size, clockElapsedSeconds);
-    printf("The speed of Processing %f bits per second\n\n\n", (double) (buffer_size/clockElapsedSeconds));
+    printf("The speed of Processing %.2f bits per millisecond\n\n\n", buffer_size/clockElapsedSeconds/1000);
 #if 1
     //------------------------------------------------------------------------------
     // Test Case 3.2.
@@ -704,9 +694,9 @@ int main(void)
 
     output_Check(crc_Value, &state);
 
-    clockElapsedSeconds = (double) (clockEnd - clockStart) / CLOCKS_PER_SEC;
+    clockElapsedSeconds = ((double)(clockEnd - clockStart)) / CLOCKS_PER_SEC;
     printf("Processing for %d bits took %f seconds\n", buffer_size, clockElapsedSeconds);
-    printf("The speed of Processing %f bits per second\n\n\n", (double) (buffer_size/clockElapsedSeconds));
+    printf("The speed of Processing %.2f bits per millisecond\n\n\n", buffer_size/clockElapsedSeconds/1000);
 #endif
     //------------------------------------------------------------------------------
     // Test Case 3.3.
@@ -776,11 +766,11 @@ int main(void)
 
     output_Check(crc_Value, &state);
 
-    clockElapsedSeconds = (double) (clockEnd - clockStart) / CLOCKS_PER_SEC;
+    clockElapsedSeconds = ((double)(clockEnd - clockStart)) / CLOCKS_PER_SEC;
     printf("Processing for %d bits took %f seconds\n", buffer_size, clockElapsedSeconds);
-    printf("The speed of Processing %f bits per second\n\n", (double) (buffer_size/clockElapsedSeconds));
+    printf("The speed of Processing %.2f bits per millisecond\n\n", buffer_size/clockElapsedSeconds/1000);
 
-    return 0U;
+    return 0;
 }
 
 
