@@ -124,6 +124,12 @@ PFLAGS="-pipe -funroll-loops -O3 -Wall -W -fPIE"
 echo  "gcc FLAGS:" $CFLAGS
 echo  "gcc PFLAGS for crc-process:" $PFLAGS
 
+#Check for the existence of a lib/ directory
+if [[ ! -e lib ]]
+then
+	mkdir lib
+fi
+
 #build static CRC lib
 echo  "Compile and build CRC-Generic static library"
 echo  "build libCRC_generic_static.a .."
