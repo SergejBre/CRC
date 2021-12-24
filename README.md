@@ -24,8 +24,6 @@
 </p>
 
 The CRC Generic library is designed as a universal solution for most practical CRC methods and provides a flexible API for communication application developers.
-
-The cyclic redundancy check (CRC) is a method for determining a check value for data in order to detect errors in transmission or storage binary data. Ideally, the process can even correct the received data automatically to avoid retransmission.
 ____
 
 ## Contents
@@ -47,7 +45,20 @@ ____
 * [License](#License)
 
 ## Specification
-TODO
+The cyclic redundancy check (CRC) is a method for determining a check value for data in order to detect errors in transmission or storage binary data. Ideally, the process can even correct the received data automatically to avoid retransmission. The CRC Generic library is designed as a universal solution for most practical CRC methods and provides a flexible API for communication application developers.
+
+The following features are offered of the CRC library (see also part [CRC Generic process workflow](#CRC-Generic-process-workflow):
+* A interface for setting CRC process and the initiation of relevant data
+* Check and validation of the initial data
+* The use of all relevant generators polynomials up to and including *CRC-64*
+* Works with any data formats (MSB, and LSB order of the significant bits)
+* The library processed the data streams with a offset .
+
+The library is currently available as:
+* 64-bit Linux static library (*lib/libCRC_generic_static.a*)
+* 64-bit Linux shared library (*lib/libCRC_generic_dynamic.so*) .
+
+The library is created and can be used with the GNU GCC compiler (version 4.7 or newer) under Linux or with the MinWG GNU compiler (version 4.8 or newer) under Windows. The installation process is described [below](#Installation-instructions).
 
 [![Top](https://img.shields.io/badge/back%20to%20top-%E2%86%A9-blue)](#Contents)
 ____
