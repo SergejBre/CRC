@@ -35,9 +35,9 @@ ____
 * [CRC Generic Library Interface](#CRC-Generic-Library-Interface)
 * [CRC Generic process workflow](#CRC-Generic-process-workflow)
 * [The Basics of CRC calculation of the residual value and Examples](#The-Basics-of-CRC-calculation-of-the-residual-value-and-Examples)
-  * [LFSR Algorithm /CRC Algorithm with the linear feedback shift register/](#LFSR-Algorithm-/CRC-Algorithm-with-the-linear-feedback-shift-register/)
-  * [LUT Algorithm /CRC Algorithm with the lookup table/](#LUT-Algorithm-/CRC-Algorithm-with-the-lookup-table/)
-  * [CRC Generic Algorithm /api_crc_process/](#CRC-Generic-Algorithm-/api_crc_process/)
+  * [LFSR Algorithm CRC Algorithm with the linear feedback shift register](#LFSR-Algorithm-CRC-Algorithm-with-the-linear-feedback-shift-register)
+  * [LUT Algorithm CRC Algorithm with the lookup table](#LUT-Algorithm-CRC-Algorithm-with-the-lookup-table)
+  * [CRC Generic Algorithm api_crc_process](#CRC-Generic-Algorithm-api_crc_process)
 * [Build process and integration of the CRC Generic library in applications](#Build-process-and-integration-of-the-CRC-Generic-library-in-applications)
   * [Optimization and Performance of the CRC Process](#Optimization-and-Performance-of-the-CRC-Process)
   * [The test concept](#The-test-concept)
@@ -72,11 +72,11 @@ TODO
 [![Top](https://img.shields.io/badge/back%20to%20top-%E2%86%A9-blue)](#Contents)
 ____
 ## The Basics of CRC calculation of the residual value and Examples
-### LFSR Algorithm /CRC Algorithm with the linear feedback shift register/
+### LFSR Algorithm CRC Algorithm with the linear feedback shift register
 TODO
-### LUT Algorithm /CRC Algorithm with the lookup table/
+### LUT Algorithm CRC Algorithm with the lookup table
 TODO
-### CRC Generic Algorithm /api_crc_process/
+### CRC Generic Algorithm api_crc_process
 TODO
 
 [![Top](https://img.shields.io/badge/back%20to%20top-%E2%86%A9-blue)](#Contents)
