@@ -262,16 +262,125 @@ The preparation for the CRC process and the flow of the CRC process work accordi
 [![Top](https://img.shields.io/badge/back%20to%20top-%E2%86%A9-blue)](#Contents)
 ____
 ## The Basics of CRC calculation of the residual value and Examples
+The Basics of Polynomial Arithmetic Modulo 2, the CRC-Calculation, the CRC-Process and the CRC-Algorithms can be found in the attached script <b>Projekt CRC-Generic.pdf</b> or in the section [Tutorium](#Tutorium-for-CRC-Generic-library). Here are only the most important things, which are based on CRC calculation and CRM processes.
 ### LFSR Algorithm CRC Algorithm with the linear feedback shift register
-TODO
+For the purposes of example, consider a polynom of the order 4 and the polynom = 10111 (0x7). Then, the perform the division, we need to use a 4-bit register:
+```
+      +----<- Data (non augmented)               Algorithm
+      |                                          ---------
+      v         3    2    1    0   Bits          1. Shift the register left by
+      |      +----+----+----+----+                  one bit, reading in a new
+     XOR---<-|    |    |    |    | Register         data bit.
+             +----+----+----+----+               2. XOR the top bit just rotated
+                       ^                            out of the register with the
+                       |                            next data bit, if XOR != 1
+  if(XOR==1) Register XOR Polynom                   then goto 1.
+                       |                         3. XOR the polynomial into the
+              ---------+----------                  register.
+          (1)   0    1    1    1   Polynom       4. Goto 1 iff more augmented
+                                                    data bits.
+```
+The following block diagram shows the principle of the LFSR-Algorithm.
+![CRC-Algorithm with the linear feedback shift register](fig/CRC-Generic_algorithmLFSR.png)
+
 ### LUT Algorithm CRC Algorithm with the lookup table
-TODO
+For the purposes of example, let us switch from a 4-bit poly to a 32-bit one (CRC32). Our register looks much the same, except the boxes represent bytes instead of bits, and the Poly is 33 bits (one implicit 1 bit at the top and 32 "active" bits).
+```
+          +-----< Data (non augmented)
+          |
+          v         3    2    1    0   Bytes
+          |      +----+----+----+----+
+         XOR----<|    |    |    |    | Register
+          |      +----+----+----+----+
+          |                ^
+          |                |
+          |               XOR
+          |                |           LUT
+          |     0+----+----+----+----+       Algorithm
+          v      +----+----+----+----+       ---------
+          |      +----+----+----+----+       1. Shift the register left by
+          |      +----+----+----+----+          one byte, reading in a new
+          |      +----+----+----+----+          data byte.
+          |      +----+----+----+----+       2. XOR the top byte just rotated
+          |      +----+----+----+----+          out of the register with the
+          +----->+----+----+----+----+          next data byte to yield an
+                 +----+----+----+----+          index into the table ([0,255]).
+                 +----+----+----+----+       3. XOR the table value into the
+                 +----+----+----+----+          register.
+                 +----+----+----+----+       4. Goto 1 iff more augmented
+              255+----+----+----+----+          data bytes.
+```
+The following block diagram shows the principle of the LUT-Algorithm.
+![CRC-Algorithm with the lookup table](fig/CRC-Generic_LUTprocess.png)
+
 ### CRC Generic Algorithm api_crc_process
-TODO
+The following block diagram shows the principle of the CRC-Generic Algoritm *api_crc_process*
+![CRC-Generic Algoritm (aspi_crc_process)](fig/CRC-Generic_CRCprocess.png)
 
 [![Top](https://img.shields.io/badge/back%20to%20top-%E2%86%A9-blue)](#Contents)
 ____
 ## Build process and integration of the CRC Generic library in applications
+The CRC Generic library uses a shell-script make.sh , which then compiles and builds CRC-Generic library and tests.
+
+These commands are aimed at optimizing compiler run­time calculation of CRC.
+```
+~/CRC$ ./make.sh
+This script compiles and builds CRC-Generic library, Examples and Tests.
+
+Prerequisites: 1) GNU compiler gcc (version >= 4.7.2) (gcc --version)
+                  Compiled CRC-Generic library, Examples and Tests.
+               2) Selection of the macro -D OPTIMIZE for:
+                  performance =BUILD_FOR_PERFORM
+                  code size =BUILD_FOR_SIZE
+                  data size =BUILD_FOR_DATA
+                  debug =BUILD_FOR_DEBUG
+
+gcc FLAGS: -pipe -O2 -Wall -W -fPIE -DOPTIMIZE=BUILD_FOR_PERFORM
+gcc PFLAGS for crc-process: -pipe -funroll-loops -O3 -Wall -W -fPIE
+Compile and build CRC-Generic static library
+build libCRC_generic_static.a ..
+
+BUILD_FOR_PERFORM
+Compile and build CRC-Generic dynamic library
+build libCRC_generic_dynamic.so ..
+
+Compile and build the Tests
+build CRC_static_tests
+build CRC_dynamic_tests
+build CRC_profiling
+```
+The *tst/tests.c* file also show how the static library of the CRC-Generic library can be integrated into applications. Of course, one can always create own C/C++ projects and use the CRC-Generic library.
+
+After [Installation instructions](#Installation-instructions), static/dynamic library, examples and tests can be built with:
+```
+~/$ cd crc/lib
+~/crc/lib$ gcc -c -pipe -O3 -Wall -W ../src/api_crc.c
+~/crc/lib$ ar r libCRC_generic_static.a api_crc.o
+```
+For the dynamic library *libCRC_generic_dynamic.so*
+```
+~/$ cd crc/lib
+~/crc/lib$ gcc -c -pipe -O3 -Wall -W -fPIC ../src/api_crc.c
+~/crc/lib$ gcc -shared -o libCRC_generic_dynamic.so api_crc.o
+```
+The resulting object files and binaries are available in the *~/crc/lib* directory.
+```
+api_crc.o  libCRC_generic_dynamic.so  libCRC_generic_static.a
+```
+If necessary, clean object files with:
+```
+~/crc/lib$ rm *.o
+~/crc/lib$ ls
+libCRC_generic_dynamic.so  libCRC_generic_static.a
+```
+For the tests *CRC_generic_test*
+```
+~/$ cd crc/tst
+~/crc/tst$ gcc -c -pipe -O3 -Wall -W tests.c
+~/crc/tst$ gcc -o CRC_generic_tests *.o -L../lib -lCRC_generic_static
+```
+The resulting object files and binaries are available in the *~/crc/tst* directory.
+
 ### Optimization and Performance of the CRC Process
 TODO
 ### The test concept
