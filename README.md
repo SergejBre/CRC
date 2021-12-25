@@ -60,17 +60,190 @@ The library is created and can be used with the GNU GCC compiler (version 4.7 or
 [![Top](https://img.shields.io/badge/back%20to%20top-%E2%86%A9-blue)](#Contents)
 ____
 ## Installation instructions
-TODO
+The library is built and can be used with GNU compiler gcc (version 4.7.2 or newer) and 64-bit GNU/Linux.
+
+For the installation user privileges are sufficient, except if additional linux packages have to be installed. In the following, we denote user privileges with a dollar sign ('$') and root privileges with a hash sign ('#').
+
+Based on a clean Linux 64-bit with standard system utilities please install:
+```
+# apt-get install build-essential
+```
+Check version of gcc:
+```
+$ gcc -v
+...
+gcc version 4.7.2 (Debian 4.7.2-5)
+```
+Extract CRC-Generic library, which is delivered as a compressed tar archive. It is assumed that the CRC-Generic library is extracted in the user's home directory with the path name as shown below. This path name is used for the rest of this document, but a different path name can be used without restrictions.
+```
+~$ tar -xvf CRCgeneric_release_YYYY-MM-DD.tar.xz -C ~/
+~$ cd crc
+~/crc$ ls
+cfg doc fig inc lib LICENSE  make.sh  README.md src tst tut
+```
+See also [Directory structure](#Directory-structure).
 
 [![Top](https://img.shields.io/badge/back%20to%20top-%E2%86%A9-blue)](#Contents)
 ____
 ## Directory structure
-TODO
+The following directories and files are part of the CRC-Generic library:
+```
+~/crc
+    |
+    +--/.git (git repository)
+    |
+    +--/cfg (Configuration)
+    |     |
+    |     +--api_crc_cfg.h (Configuration head file for the CRC-Generic library)
+    |
+    +--/doc (Documentation)
+    |     |
+    |     +--Projekt CRC-Generic.pdf (Grundlagen und Beschreibung vom CRC-Prozess)
+    |     |
+    |     +--Tutorium for CRC.pdf (Tutorial for the CRC-Generic library)
+    |
+    +--/fig (Figures to CRC-Generic project)
+    |     |
+    |     +--CRC-Generic_algorithmLFSR.png (algorithm LFSR picture)
+    |     |
+    |     +--CRC-Generic_CRCprocess.png (CRC-Process picture)
+    |     |
+    |     +--CRC-Generic_LUTprocess.png (LUT-Process picture)
+    |     |
+    |     +--CRC-Generic_processOverview.png (Overview process picture)
+    |     |
+    |     +--Direct Forward LUT Algorithm.png
+    |     |
+    |     +--Direct Straightforward SR Algorithm.png
+    |     |
+    |     +--Division-Register.png
+    |     |
+    |     +--Reflected Table-Driven.png
+    |     |
+    |     +--Reversed LUT Algorithm.png
+    |     |
+    |     +--Reversed Straightforward SR Algorithm.png
+    |     |
+    |     +--Table-Driven.png
+    |
+    +--/inc (Header files for the CRC-Generic library)
+    |     |
+    |     +--api_crc.h (head file for the CRC-Generic library)
+    |     |
+    |     +--api_crc_process.h (head file for the CRC-Generic library. Process functions)
+    |
+    +--/lib (directory for object files and compilation results (static and dynamic library)
+    |     |
+    |     +--libCRC_generic_dynamic.so (symbolic link for dynamic CRC-Generic library)
+    |     |
+    |     +--libCRC_generic_dynamic.so.1 (symbolic link for dynamic CRC-Generic library)
+    |     |
+    |     +--libCRC_generic_dynamic.so.1.x.y (dynamic CRC-Generic library)
+    |     |
+    |     +--libCRC_generic_static.a (static CRC-Generic library)
+    |
+    +--/src (Source files for the CRC-Generic library)
+    |     |
+    |     +--api_crc.c (source file for the CRC-Generic library)
+    |     |
+    |     +--api_crc_process.c (source file for the CRC-Generic library. Process functions)
+    |
+    +--/tst (Tests to the CRC-Generic project, directory for tests files)
+    |     |
+    |     +--tests.c (source file for Unit-Test)
+    |
+    +--/tut (Tutorial to the CRC-Generic project)
+    |     |
+    |     +--examples.h (head file for Examples)
+    |     |
+    |     +--examples.c (source file for Examples)
+    |     |
+    |     +--examples*_in.bin (input data file for Examples*)
+    |     |
+    |     +--examples*_out.bin (output data file for Examples*)
+    |
+    +--LICENSE
+    |
+    +--make.sh (make file for the CRC-Generic library)
+    |
+    +--README.md
+```
 
 [![Top](https://img.shields.io/badge/back%20to%20top-%E2%86%A9-blue)](#Contents)
 ____
 ## CRC Generic Library Interface
-TODO
+The Interface of the CRC Generic library consists of the 6 public functions:
+* The initialization function: \ref api_crc_init
+* The LUT table function: \ref api_crc_table
+* The function gives size of the table back: \ref api_crc_sizeofTable
+* The method for cleaning of old data: \ref api_crc_reset
+* The method for calculate the CRC proof sum: \ref api_crc_process
+* The method for return the requested CRC value: \ref api_crc_finalize
+```c
+// The initialization function is used to fill the data necessary for the calculation CRC.
+api_crc_status_e api_crc_init(uint64_t const		polynomial,
+                               uint64_t const		inputXOR,
+                               uint64_t const		outputXOR,
+                               uint64_t const *const	table,
+                               api_crc_order_e const	inputOrder,
+                               api_crc_order_e const	outputOrder,
+                               api_crc_device_s *const 	device
+                               );
+
+// The function fills the LUT table with the previously calculated values.
+api_crc_status_e api_crc_table(api_crc_device_s * 	device,
+                               uint64_t *const		table,
+                               uint16_t 		size
+                               );
+
+// This function returns the size of LUT table.
+uint16_t api_crc_sizeofTable(uint64_t const 	polynomial);
+
+// The method used to api_crc_reset cleaning of old data.
+api_crc_status_e api_crc_reset(api_crc_device_s const *const 	device,
+                               api_crc_state_t *const		state
+                               );
+
+// The method calculates the CRC proof sum.
+api_crc_status_e api_crc_process(api_crc_device_s const *const	device,
+                                 api_crc_state_t *const 	state,
+                                 uint8_t const *const		buffer,
+                                 uint8_t const			offset,
+                                 uint32_t const			size
+                                 );		
+
+// This method returns the requested value and taking order predetermined values outputOrder,
+// outputOrder and the value outputXOR.
+api_crc_status_e api_crc_finalize(api_crc_device_s const *const	device,
+                                  api_crc_state_t *const 	state 
+                                  );
+```
+a data structure: *api_crc_device_s*
+```c
+// Device structure for calculating a Cyclic Redundancy Code (CRC) checksum.
+typedef struct
+{
+   // Generator polynomial for calculating the CRC checksum.
+   uint64_t polynomial;
+   // Initial value for XORing with the polynomial division state register.
+   uint64_t inputXOR;
+   // Final value for XORing with the polynomial division state register.
+   uint64_t outputXOR;
+   // Lookup table for processing one input byte per iteration.
+   uint64_t const *table;
+   // Bit order for processing input bytes.
+   api_crc_order_e inputOrder;
+   // Bit order for storing the CRC checksum.
+   api_crc_order_e outputOrder;
+} api_crc_device_s;
+```
+and a state variable: *api_crc_state_t*
+```c
+// State register for storing intermediate as well as the final value of the Cyclic Redundancy Code (CRC)
+// checksum calculation.
+typedef uint64_t api_crc_state_t;
+```
+The detailed description of the methods is in the section \ref API_LIBRARY_CRC_INTERFACE
 
 [![Top](https://img.shields.io/badge/back%20to%20top-%E2%86%A9-blue)](#Contents)
 ____
