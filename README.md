@@ -173,12 +173,12 @@ The following directories and files are part of the CRC-Generic library:
 ____
 ## CRC Generic Library Interface
 The Interface of the CRC Generic library consists of the 6 public functions:
-* The initialization function: \ref api_crc_init
-* The LUT table function: \ref api_crc_table
-* The function gives size of the table back: \ref api_crc_sizeofTable
-* The method for cleaning of old data: \ref api_crc_reset
-* The method for calculate the CRC proof sum: \ref api_crc_process
-* The method for return the requested CRC value: \ref api_crc_finalize
+* The initialization function: *api_crc_init*
+* The LUT table function: *api_crc_table*
+* The function gives size of the table back: *api_crc_sizeofTable*
+* The method for cleaning of old data: *api_crc_reset*
+* The method for calculate the CRC proof sum: *api_crc_process*
+* The method for return the requested CRC value: *api_crc_finalize*
 ```c
 // The initialization function is used to fill the data necessary for the calculation CRC.
 api_crc_status_e api_crc_init(uint64_t const		polynomial,
@@ -243,7 +243,7 @@ and a state variable: *api_crc_state_t*
 // checksum calculation.
 typedef uint64_t api_crc_state_t;
 ```
-The detailed description of the methods is in the section \ref API_LIBRARY_CRC_INTERFACE
+The detailed description of the methods is in the documentation section API_LIBRARY_CRC_INTERFACE
 
 [![Top](https://img.shields.io/badge/back%20to%20top-%E2%86%A9-blue)](#Contents)
 ____
