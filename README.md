@@ -132,7 +132,7 @@ The following directories and files are part of the CRC-Generic library:
     |     |
     |     +--api_crc_process.h (head file for the CRC-Generic library. Process functions)
     |
-    +--/lib (directory for object files and compilation results (static and dynamic library)
+    +--/lib (directory for object files and build results (static and dynamic library)
     |     |
     |     +--libCRC_generic_dynamic.so (symbolic link for dynamic CRC-Generic library)
     |     |
@@ -248,7 +248,16 @@ The detailed description of the methods is in the documentation section API_LIBR
 [![Top](https://img.shields.io/badge/back%20to%20top-%E2%86%A9-blue)](#Contents)
 ____
 ## CRC Generic process workflow
-TODO
+The preparation for the CRC process and the flow of the CRC process work according to the below added scheme. Here are the explanations of the functions and methods that are needed to the CRC process:
+* The function *api_crc_init* is required for the initialization and determination of the CRC process.
+* The functions *api_crc_sizeofTable* and *api_crc_table* are required exclusively for the LUT process.
+* The function *api_crc_reset* is a useful tool for next cases:
+  * a new initial value *inputXOR* to set in the register,
+  * in order to clean register from the old data.
+* The function *api_crc_process* is required for the CRC Processing.
+* The function *api_crc_finalize* you need for CRC value output.
+
+![CRC-Generic Process Overview](fig/CRC-Generic_processOverview.png)
 
 [![Top](https://img.shields.io/badge/back%20to%20top-%E2%86%A9-blue)](#Contents)
 ____
