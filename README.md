@@ -78,7 +78,7 @@ Extract CRC-Generic library, which is delivered as a compressed tar archive. It 
 ```
 ~$ tar -xvf CRCgeneric_release_YYYY-MM-DD.tar.xz -C ~/
 ~$ cd crc
-~/crc$ ls
+~/CRC$ ls
 cfg doc fig inc lib LICENSE  make.sh  README.md src tst tut
 ```
 See also [Directory structure](#Directory-structure).
@@ -88,7 +88,7 @@ ____
 ## Directory structure
 The following directories and files are part of the CRC-Generic library:
 ```
-~/crc
+~/CRC
     |
     +--/.git (git repository)
     |
@@ -354,44 +354,219 @@ The *tst/tests.c* file also show how the static library of the CRC-Generic libra
 After [Installation instructions](#Installation-instructions), static/dynamic library, examples and tests can be built with:
 ```
 ~/$ cd crc/lib
-~/crc/lib$ gcc -c -pipe -O3 -Wall -W ../src/api_crc.c
-~/crc/lib$ ar r libCRC_generic_static.a api_crc.o
+~/CRC/lib$ gcc -c -pipe -O3 -Wall -W ../src/api_crc.c
+~/CRC/lib$ ar r libCRC_generic_static.a api_crc.o
 ```
 For the dynamic library *libCRC_generic_dynamic.so*
 ```
-~/$ cd crc/lib
-~/crc/lib$ gcc -c -pipe -O3 -Wall -W -fPIC ../src/api_crc.c
-~/crc/lib$ gcc -shared -o libCRC_generic_dynamic.so api_crc.o
+~/$ cd CRC/lib
+~/CRC/lib$ gcc -c -pipe -O3 -Wall -W -fPIC ../src/api_crc.c
+~/CRC/lib$ gcc -shared -o libCRC_generic_dynamic.so api_crc.o
 ```
-The resulting object files and binaries are available in the *~/crc/lib* directory.
+The resulting object files and binaries are available in the *~/CRC/lib* directory.
 ```
 api_crc.o  libCRC_generic_dynamic.so  libCRC_generic_static.a
 ```
 If necessary, clean object files with:
 ```
-~/crc/lib$ rm *.o
-~/crc/lib$ ls
+~/CRC/lib$ rm *.o
+~/CRC/lib$ ls
 libCRC_generic_dynamic.so  libCRC_generic_static.a
 ```
 For the tests *CRC_generic_test*
 ```
-~/$ cd crc/tst
-~/crc/tst$ gcc -c -pipe -O3 -Wall -W tests.c
-~/crc/tst$ gcc -o CRC_generic_tests *.o -L../lib -lCRC_generic_static
+~/$ cd CRC/tst
+~/CRC/tst$ gcc -c -pipe -O3 -Wall -W tests.c
+~/CRC/tst$ gcc -o CRC_generic_tests *.o -L../lib -lCRC_generic_static
 ```
-The resulting object files and binaries are available in the *~/crc/tst* directory.
+The resulting object files and binaries are available in the *~/CRC/tst* directory.
 
 ### Optimization and Performance of the CRC Process
-TODO
+The script make.sh for building the library initially assumes various ways to optimize the executable code. So, it provides the ability to:
+1. optimize the size of the binary code,
+2. the size of the data used (load on the stack) and
+3. the computational performance.
+
+To do this, you must uncomment the lines in the appropriate place in the script make.sh.
+```sh
+################################################################################
+# Compile and build CRC-Generic library and tests
+################################################################################
+
+#gcc FLAGS for Optimization of Code Size
+#CFLAGS="-pipe -Os -Wall -W -fPIE -DOPTIMIZE=BUILD_FOR_SIZE"
+
+#gcc FLAGS for Optimization of Data
+#CFLAGS="-pipe -O2 -Wall -W -fPIE -DOPTIMIZE=BUILD_FOR_DATA"
+
+#gss FLAGS for Optimization of Performance
+CFLAGS="-pipe -O2 -Wall -W -fPIE -DOPTIMIZE=BUILD_FOR_PERFORM"
+
+#gss FLAGS for Debug build of CRC library
+#CFLAGS="-pipe -g -Wall -W -fPIC -DOPTIMIZE=BUILD_FOR_DEBUG"
+```
+For profiling CRC processes and methods, you can use the *gcc* *gprof* tool. To do this, you need to recompile the CRC library with the additional *-pg* option. For instance:
+```
+~/CRC/lib$ gcc -c -pg -O2 -Wall -W ../src/api_crc.c
+~/CRC/lib$ ar  r libCRC_generic_static.a api_crc.o
+~/CRC/lib$ cd ../tst
+~/CRC/tst$ gcc tests.c -pg -o CRC_profiling -O2 -L../lib -lCRC_generic_static
+```
+Running the profiled library gives information about the distribution of time between processes:
+```
+~/CRC/tst$ ./CRC_profiling
+~/CRC/tst$ gprof CRC_profiling gmon.out -p
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  ms/call  ms/call  name    
+ 89.04      0.24     0.24      525     0.46     0.46  api_crc_processForwardBit
+  7.42      0.26     0.02        3     6.68    10.02  api_crc_processForwardLUT
+  3.71      0.27     0.01  1966080     0.00     0.00  api_crc_readForwardTable32
+  0.00      0.27     0.00      256     0.00     0.00  api_crc_writeForwardTable16
+  0.00      0.27     0.00      256     0.00     0.00  api_crc_writeForwardTable32
+  0.00      0.27     0.00        7     0.00     0.00  api_crc_finalize
+  0.00      0.27     0.00        7     0.00     5.14  api_crc_process
+  0.00      0.27     0.00        7     0.00     0.00  api_crc_reset
+  0.00      0.27     0.00        4     0.00     0.00  api_crc_readForwardTable16
+  0.00      0.27     0.00        2     0.00     0.00  api_crc_reverse64
+  0.00      0.27     0.00        1     0.00     0.00  api_crc_processReverseBit
+```
+
 ### The test concept
-TODO
+Unit test is used to verifiability of the code of the interface functions.
+- Testing the interface of the CRC library,
+- Test of the CRC-algorithms,
+- Performance tests.
+
+The testing program consists of three test blocks:
+1. Block tests the CRC library interface. The function arguments of public functions are tested in accordance with the validity and the value fields.
+2. Block is intended for testing of CRC algorithms. Here the method Directly Forwad / Reverse LFSR and LUT Forward / Reverse process in the separate tests cases are tested.
+3. Block tests the performance of different CRC (Direcktly and LUT) method based on the CRC32 polynomial.
+
+⚠️ Note: The tests are also recommended as further examples on how to use the CRC-Generic library. See [Build process and integration of the CRC Generic library in applications](#Build-process-and-integration-of-the-CRC-Generic-library-in-applications).
+
 ### Run tests
-TODO
+Tests are run as follows:
+```
+~/CRC cd tst
+~/CRC/tst$ ./CRC_generic_tests
+```
+The successful test result looks like this:
+1. Block (Testing the interface of the CRC library)
+```
+/******************************************************************************/
+/* Test Case 1.1.                                                             */
+/* Review of api_crc_init(polynomial,inputXOR,outputXOR,table,inputOrder,...) */
+/******************************************************************************/
+Status of api_crc_init(polynomial,inputXOR,outputXOR,table,inputOrder,...) is Ok
+
+
+/******************************************************************************/
+/* Test Case 1.2.                                                             */
+/* The review for the function api_crc_table(device, table, size)             */
+/******************************************************************************/
+Status of api_crc_table(device, table, size) is Ok
+
+
+/******************************************************************************/
+/* Test Case 1.3.                                                             */
+/* The review for the function api_crc_sizeofTable(polynomial)                */
+/******************************************************************************/
+Status of the function api_crc_sizeofTable(polynomial) is Ok
+
+
+/******************************************************************************/
+/* Test Case 1.4.                                                             */
+/* The review for the function  api_crc_reset(device, state)                  */
+/******************************************************************************/
+Status of api_crc_reset(&device, &state) is Ok
+
+
+/******************************************************************************/
+/* Test Case 1.5.                                                             */
+/* Review for function api_crc_process(device, state, buffer, offset, size)   */
+/******************************************************************************/
+Size of buffer in Bits = 8
+Status of api_crc_process(device, state, buffer, offset, size) is Ok
+
+
+/******************************************************************************/
+/* Test Case 1.6.                                                             */
+/* The review for the function api_crc_finalize(device, state)                */
+/******************************************************************************/
+Status of api_crc_finalize(&device, &state) is Ok
+```
+2. Block (Test of CRC­algorithms)
+```
+/******************************************************************************/
+/* Test Case 2.1.                                                             */
+/* CRC-16                                                                     */
+/* generator polynomial: G(x) = x^16 + x^15 + x^2 + 1                         */
+/* initial:              0b0000000000000000 (0x00)                            */
+/* outputXOR:            0b0000000000000000 (0x00)                            */
+/* Bits Order:           LSB                                                  */
+/* data:            0x31 0x32 0x33 0x34 0x35 0x36 0x37 0x38 0x39              */
+/* CRC-16:          0xBB3D                                                    */
+/******************************************************************************/
+api_crc_reset status code = 0
+buffer_size in Bits = 72
+api_crc_process status code = 0
+CRC Rest (state) = bb3d
+api_crc_finalize status code = 0
+CRC Rest = bb3d
+/******************************************************************************/
+/* Output for Check function output_Check(crc_Value, state)                   */
+/******************************************************************************/
+The review of the process was needed, because the checksums match: bb3d = bb3d
+
+...
+```
+3. Block (Performance tests)
+```
+/******************************************************************************/
+/* Test Case 3.1.                                                             */
+/* Performance Test for CRC-32 Forward LFSR                                   */
+/******************************************************************************/
+api_crc_init status code = 0
+api_crc_reset status code = 0
+api_crc_process status code = 0
+api_crc_finalize status code = 0
+CRC Rest = 57b403d1
+/******************************************************************************/
+/* Output for Check function output_Check(crc_Value, state)                   */
+/******************************************************************************/
+The review of the process was needed, because the checksums match: 57b403d1 = 57b403d1
+
+Processing for 15728640 bits took 0.102956 seconds
+The speed of Processing 152770.50 bits per millisecond
+
+
+/******************************************************************************/
+/* Test Case 3.2.                                                             */
+/* Performance Test for CRC-32 Reverse LFSR                                   */
+/******************************************************************************/
+api_crc_init status code = 0
+api_crc_reset status code = 0
+api_crc_process status code = 0
+api_crc_finalize status code = 0
+CRC Rest = 4c36d339
+/******************************************************************************/
+/* Output for Check function output_Check(crc_Value, state)                   */
+/******************************************************************************/
+The review of the process was needed, because the checksums match: 4c36d339 = 4c36d339
+
+Processing for 15728640 bits took 0.086525 seconds
+The speed of Processing 181781.45 bits per millisecond
+
+...
+```
 
 [![Top](https://img.shields.io/badge/back%20to%20top-%E2%86%A9-blue)](#Contents)
 ____
 ## Documentation
-TODO
+For the detailed API documentation, follow link - [![Docs Doxygen](https://img.shields.io/badge/docs-Doxygen-blue.svg)](https://sergejbre.github.io/CRC/doc/html/index.html)
 
 [![Top](https://img.shields.io/badge/back%20to%20top-%E2%86%A9-blue)](#Contents)
 ____
