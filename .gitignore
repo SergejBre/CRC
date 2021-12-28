@@ -55,6 +55,7 @@ dkms.conf
 doc/html
 doc/latex
 doc/figures
+doc/Doxyfile
 tst/CRC_dynamic_tests
 tst/CRC_static_tests
 tst/CRC_profiling
