@@ -498,7 +498,7 @@ Status of api_crc_process(device, state, buffer, offset, size) is Ok
 /******************************************************************************/
 Status of api_crc_finalize(&device, &state) is Ok
 ```
-2. Block (Test of CRC­algorithms)
+2. Block (Test of CRC-algorithms)
 ```
 /******************************************************************************/
 /* Test Case 2.1.                                                             */
