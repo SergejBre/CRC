@@ -1,0 +1,165 @@
+//------------------------------------------------------------------------------
+//  Home Office
+//  Nürnberg, Germany
+//  E-Mail: sergej1@email.ua
+//
+//  Copyright (C) 2021 free Project CRC Generic library. All rights reserved.
+//------------------------------------------------------------------------------
+//  The CRC Generic library is designed as a universal solution for most practical
+//  CRC methods and provides a flexible API for communication application developers
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+// Unit Test for CRC Generic library
+//------------------------------------------------------------------------------
+//!
+//! \page unit_test Unit Test for CRC Generic library
+//!
+//! \tableofcontents
+//!
+//! \section CRC_GENERIC_SECTION_TEST Unit Test
+//! 
+//! Unit test is used to verifiability of the code of the interface functions:
+//! - Testing the interface of the CRC library,
+//! - Test of the CRC-algorithms,
+//! - Performance tests.
+//!
+//! The testing program consists of three test blocks:
+//! 1. Block tests the CRC library interface. The function arguments of public functions are tested in accordance with the validity and the value fields.
+//! 2. Block is intended for testing of CRC algorithms. Here the method Directly Forwad / Reverse LFSR and LUT Forward / Reverse process in the separate tests cases are tested.
+//! 3. Block tests the performance of different CRC (Direcktly and LUT) method based on the CRC32 polynomial.
+//!
+//! \note
+//! Block tests the performance of different CRC (Direcktly and LUT) method based on the CRC32 polynomial. See \ref CRC_GENERIC_SECTION_BUILDPROCESS.
+//!
+//! \subsection CRC_GENERIC_SECTION_TEST_RUN_TESTS Run tests
+//!
+//! Tests are run as follows:
+//!
+//! \code{.sh}
+//!  ~/CRC cd tst
+//!  ~/CRC/tst$ ./CRC_generic_tests
+//! \endcode
+//!
+//!
+//! \subsection CRC_GENERIC_SECTION_TEST_CASES1 The test of the CRC library interface
+//!
+//! The successful test result looks like this:
+//! \code{.sh}
+//!
+//! /******************************************************************************/
+//! /* Test Case 1.1.                                                             */
+//! /* Review of api_crc_init(polynomial,inputXOR,outputXOR,table,inputOrder,...) */
+//! /******************************************************************************/
+//! Status of api_crc_init(polynomial,inputXOR,outputXOR,table,inputOrder,...) is Ok
+//! 
+//! 
+//! /******************************************************************************/
+//! /* Test Case 1.2.                                                             */
+//! /* The review for the function api_crc_table(device, table, size)             */
+//! /******************************************************************************/
+//! Status of api_crc_table(device, table, size) is Ok
+//! 
+//! 
+//! /******************************************************************************/
+//! /* Test Case 1.3.                                                             */
+//! /* The review for the function api_crc_sizeofTable(polynomial)                */
+//! /******************************************************************************/
+//! Status of the function api_crc_sizeofTable(polynomial) is Ok
+//! 
+//! 
+//! /******************************************************************************/
+//! /* Test Case 1.4.                                                             */
+//! /* The review for the function  api_crc_reset(device, state)                  */
+//! /******************************************************************************/
+//! Status of api_crc_reset(&device, &state) is Ok
+//! 
+//! 
+//! /******************************************************************************/
+//! /* Test Case 1.5.                                                             */
+//! /* Review for function api_crc_process(device, state, buffer, offset, size)   */
+//! /******************************************************************************/
+//! Size of buffer in Bits = 8
+//! Status of api_crc_process(device, state, buffer, offset, size) is Ok
+//! 
+//! 
+//! /******************************************************************************/
+//! /* Test Case 1.6.                                                             */
+//! /* The review for the function api_crc_finalize(device, state)                */
+//! /******************************************************************************/
+//! Status of api_crc_finalize(&device, &state) is Ok
+//!
+//! \endcode
+//! 
+//! \subsection CRC_GENERIC_SECTION_TEST_CASES2 The test of CRC algorithms
+//!
+//! The test output:
+//! \code{.sh}
+//! /******************************************************************************/
+//! /* Test Case 2.1.                                                             */
+//! /* CRC-16                                                                     */
+//! /* generator polynomial: G(x) = x^16 + x^15 + x^2 + 1                         */
+//! /* initial:              0b0000000000000000 (0x00)                            */
+//! /* outputXOR:            0b0000000000000000 (0x00)                            */
+//! /* Bits Order:           LSB                                                  */
+//! /* data:            0x31 0x32 0x33 0x34 0x35 0x36 0x37 0x38 0x39              */
+//! /* CRC-16:          0xBB3D                                                    */
+//! /******************************************************************************/
+//! api_crc_reset status code = 0
+//! buffer_size in Bits = 72
+//! api_crc_process status code = 0
+//! CRC Rest (state) = bb3d
+//! api_crc_finalize status code = 0
+//! CRC Rest = bb3d
+//! /******************************************************************************/
+//! /* Output for Check function output_Check(crc_Value, state)                   */
+//! /******************************************************************************/
+//! The review of the process was needed, because the checksums match: bb3d = bb3d
+//!
+//! ...
+//! \endcode
+//!
+//! \subsection CRC_GENERIC_SECTION_TEST_CASES3 The test the performance for the different CRC-processes
+//!
+//! The test output:
+//! \code{.sh}
+//! /******************************************************************************/
+//! /* Test Case 3.1.                                                             */
+//! /* Performance Test for CRC-32 Forward LFSR                                   */
+//! /******************************************************************************/
+//! api_crc_init status code = 0
+//! api_crc_reset status code = 0
+//! api_crc_process status code = 0
+//! api_crc_finalize status code = 0
+//! CRC Rest = 57b403d1
+//! /******************************************************************************/
+//! /* Output for Check function output_Check(crc_Value, state)                   */
+//! /******************************************************************************/
+//! The review of the process was needed, because the checksums match: 57b403d1 = 57b403d1
+//! 
+//! Processing for 15728640 bits took 0.102956 seconds
+//! The speed of Processing 152770.50 bits per millisecond
+//! 
+//! 
+//! /******************************************************************************/
+//! /* Test Case 3.2.                                                             */
+//! /* Performance Test for CRC-32 Reverse LFSR                                   */
+//! /******************************************************************************/
+//! api_crc_init status code = 0
+//! api_crc_reset status code = 0
+//! api_crc_process status code = 0
+//! api_crc_finalize status code = 0
+//! CRC Rest = 4c36d339
+//! /******************************************************************************/
+//! /* Output for Check function output_Check(crc_Value, state)                   */
+//! /******************************************************************************/
+//! The review of the process was needed, because the checksums match: 4c36d339 = 4c36d339
+//! 
+//! Processing for 15728640 bits took 0.086525 seconds
+//! The speed of Processing 181781.45 bits per millisecond
+//! 
+//! ...
+//! \endcode
+//!
+//!
