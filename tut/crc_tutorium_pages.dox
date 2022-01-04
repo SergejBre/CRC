@@ -1,0 +1,532 @@
+//------------------------------------------------------------------------------
+//  Home Office
+//  Nürnberg, Germany
+//  E-Mail: sergej1@email.ua
+//
+//  Copyright (C) 2021 free Project CRC Generic library. All rights reserved.
+//------------------------------------------------------------------------------
+//  The CRC Generic library is designed as a universal solution for most practical
+//  CRC methods and provides a flexible API for communication application developers
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+// Tutorial for CRC Generic library
+//------------------------------------------------------------------------------
+//!
+//! \page tutorial Tutorial for CRC Generic library
+//!
+//! \tableofcontents
+//!
+//! \section CRC_GENERIC_SECTION_TUTORIUM Grundlagen
+//! - Die polynomische Arithmetik Modulo 2.
+//! - Die Multiplikation der binären Polynome.
+//! - Das Dividieren der binären Polynome mit dem Rest.
+//! - CRC Verfahren.
+//! \.
+//!
+//! \subsection CRC_GENERIC_SECTION_TUTORIUM_BASIS_1 Die polynomische Arithmetik Modulo 2 (polynomial arithmetic mod 2)
+//! 
+//! Wir betrachten die binären Polynome über einen endlichen Feld \f$GF\left(2\right)\f$.
+//! Man sagt, dass auf einem endlichen Feld eine Potenzfunktion \f$X\rightarrow X^{k}\in GF\left(2\right)\f$
+//! definiert ist, wenn für diese Funktion die folgenden Regeln gelten
+//! 
+//! 1. \f$X^{k}\times X^{m}=X^{k+m}\f$,
+//! 2. \f$X^{k}\div X^{m}=X^{k-m}\f$,
+//! 3. \f$X^{0}=1\f$.
+//! 
+//! Diese einfachen Regeln sorgen für die Eindeutigkeit der Multiplikation
+//! bzw. der Division über die binären Polynomen: \f$a_{n}X^{n}+a_{n-1}X^{n-1}+...+a_{0}X^{0},a_{k}\in\left\{ 0,1\right\} \f$.
+//! 
+//! Die beiden Operationen Addition und Multiplikation \f$\left(+,\times\right)\f$
+//! können auf die Polynomen Koeffizienten angewandt werden, womit die
+//! entsprechenden Koeffizienten wie einfache binäre Zahlen behandelt
+//! werden sollen.
+//! \code{.txt}
+//!  '+' 0  1  '*' 0  1
+//!   0  0  1   0  0  0
+//!   1  1  0   1  0  1
+//! \endcode
+//! 
+//! Somit bekommt man eine einfache Regel für die polynomische Arithmetik.
+//! Man kann die binären Polynome bei Addieren bzw. Subtrahieren fast
+//! wie die binäre Zahlenfolgen behandeln (mit einem Unterschied, dass
+//! keine Verschiebungen in höheren Register passieren). Zum Beispiel,
+//! für zwei Polynome\n
+//! \f$\left(X^{4}+X^{2}+X^{1}+X^{0}\right)+\left(X^{3}+X^{1}+X^{0}\right)\f$\n
+//! \f$=\left(1\cdot X+0\cdot X^{3}+1\cdot X^{2}+1\cdot X^{1}+1\cdot X^{0}\right)+\left(1\cdot X^{3}+0\cdot X^{2}+1\cdot X^{1}+1\cdot X^{0}\right)\f$\n
+//! \f$= (1+0)X^{4}+(0+1)X^{3}+(1+0)X^{2}+(1+1)X^{1}+(1+1)X^{0}\f$\n
+//! \f$= X^{4}+X^{3}+X^{2}\f$.
+//! 
+//! Statt des Polynoms kann man eine Folge der binären Zahlen (Polynom
+//! Koeffizienten) verwenden und Bits-weise rechnen:
+//!
+//! Beispiel 1
+//! \code{.txt}
+//!  10111   10111     10111
+//! + 1011  - 1011  xor 1011
+//! ------  ------    ------
+//!  11100   11100     11100
+//! \endcode
+//! 
+//! Wie man sieht, ist das Ergebnis der Addition (oder Subtraktion) genau
+//! gleich wie Wirkung der Operation XOR (logische Operation entweder-oder).
+//! 
+//! Aus der polynomischen Arithmetik folgt eine interessante Eigenschaft.
+//! Für jedes Polynom \f$P\left(X\right)\f$ über \f$GF\left(2\right)\f$ gilt:
+//! \f$p\cdot P\left(X\right)=O\f$, wo \f$p\f$ Ordnung der endlichen zyklischen
+//! Gruppe \f$a=b\bmod(p)\f$ und \f$O\f$ ein Nullpolynom ist. Darüber hinaus
+//! gilt für jedes binäre Polynom von Ordnung \f$p=2\f$: \f$P\left(X\right)=-P\left(X\right)\f$.
+//! Im Prinzip ist egal ob man zwei binäre Polynome addiert oder subtrahiert.
+//! Das Ergebnis wird gleich.
+//!
+//! \subsection CRC_GENERIC_SECTION_TUTORIUM_BASIS_2 Die Multiplikation der binären Polynome
+//!
+//! Seien zwei Polynome gegeben: \f$P(X)=p_{n}X^{n}+p_{n-1}X^{n-1}+...+p_{0}X^{0}\f$
+//! und \f$Q(X)=q_{k}X^{k}+q_{k-1}X^{k-1}+...+q_{0}X^{0}\f$. Das Ergebnis
+//! einer Multiplikation ist ein Polynom \f$W(X)=w_{n+k}X^{n+k}+w_{n+k-1}X^{n+k-1}+...+w_{0}X^{0}\f$
+//! von \f$n+k\f$ Ordnung, dessen Koeffizienten nach der folgenden Regel
+//! berechnet werden sollen: \f$w_{m}=\sum_{s+t=m}p_{s}\cdot q_{t}\f$.
+//!
+//! Wir können (wie beim Addieren und Subtrahieren) statt der Polynome
+//! nur die Reihenfolgen der binären Zahlen (Polynom Koeffizienten) verwenden.
+//! Zum Beispiel, für das Multiplizieren der Polynome:
+//! \f$(1\cdot X^{2}+1\cdot X^{1}+1\cdot X^{0})\times(1\cdot X^{1}+1\cdot X^{0})=1\cdot1\cdot X^{3} +(1\cdot1+1\cdot1)X^{2}+(1\cdot1+1\cdot1)X^{1}+1\cdot1\cdot X^{0}=1\cdot X^{3}+0\cdot X^{2}+0\cdot X^{1}+1\cdot X^{0}\f$
+//! 
+//! verwendet man ein symbolische Berechnung
+//!
+//! Beispiel 2
+//! \code{.txt}
+//!   111
+//!  * 11
+//!  ----
+//!   111(XOR)
+//!  111
+//!  ----
+//!  1001
+//! \endcode
+//!
+//! Grundsätzlich wird das Produkt einer Multiplikation wie folgt gebildet.
+//! Der Multiplikator (als Bits-Folge) wird auf \f$m\f$ Bits (Stellen) nach
+//! links verschoben, wenn der entsprechenden Koeffizienten des Multiplikandes
+//! \f$q_{m}\f$ 1 ist und dann werden allen Verschiebungen des Multiplikators
+//! (Bits-Folgen) zusammen addiert (bzw. XOR-det).
+//!
+//! \subsection CRC_GENERIC_SECTION_TUTORIUM_BASIS_3 Das Dividieren der binären Polynome mit dem Rest
+//!
+//! Das Dividieren mit Rest funktioniert nach dem ähnlichen Verfahren.
+//! \f$P(X)\div Q(X)=T(X)\times Q(X)+R(X)\f$, wo \f$ord(R)<ord(Q)\f$ ist, oder
+//! in anderem Notation (nach C.Gauß) \f$R(X)=P(X)\bmod Q(X)\f$. Nach einem
+//! einfachen Verfahren kann man den Restwert leicht ausrechnen. Der Divisor
+//! \f$Q\f$ wird zu dem linken (ungleich Null) Bit des Dividendes \f$P\f$ verschoben
+//! und vom Polynom \f$P\f$ abgezogen. Dann entsteht ein Restpolynom, das
+//! mit dem gleichen Verfahren behandelt wird, bis schließlich ein Restpolynom
+//! der Ordnung kleiner als Ordnung des Divisores entsteht. Das Ergebnis
+//! \f$R\left(X\right)\f$ mit der Bedingung \f$ord(R)<ord(Q)\f$ ist der endgültige
+//! Restwert. Zum Beispiel, bekommen wir einen Restwert nach dem oben
+//! beschriebenen Verfahren:
+//!
+//! Beispiel 3
+//!
+//! \f$(X^{5}+X^{2}+X^{0})\div(X^{1}+X^{0})=(X^{4}+X^{3}+X^{2})\times(X^{1}+X^{0})+X^{0}\f$
+//! 
+//! \code{.txt}
+//!  100101 : 11 = 11100 * 11 + 1
+//!
+//!   100101|11
+//! - 11    ------
+//!   ---    11100
+//!   10  	
+//! - 11
+//!   ---
+//!    11
+//!  - 11
+//!    ---
+//!     00
+//!   - 00
+//!     ---
+//!      01
+//!    - 00
+//!      --
+//!       1 = Rest
+//! \endcode
+//!
+//! da \f$ord\left(X^{0}\right)=0<ord\left(X^{1}+X^{0}\right)=1\f$.
+//!
+//! Beispiel 4
+//!
+//! \f$(X^{16}+X^{13}+X^{12}+X^{4})\div(X^{4}+X^{1}+X^{0})=(X^{16}+X^{13}+X^{12}+X^{4})\times(X^{4}+X^{1}+X^{0})+X^{1}+X^{0}\f$
+//! 
+//! \code{.txt}
+//! 10011000000010000| 10011
+//! 10011            ---------------
+//! -----              1000000000001
+//!     00000
+//!     00000
+//!     -----
+//!         00001
+//!         00000
+//!         -----
+//!             10000
+//!             10011
+//!             -----
+//! Rest:          11 = 0x3
+//!
+//! Prüfung:
+//!          1000000000001
+//!         *        10011
+//!         --------------
+//!          1000000000001
+//!         1000000000001
+//!      1000000000001
+//!      -----------------
+//!      10011000000010011
+//! 
+//!      10011000000010011
+//!   xor               11
+//!      -----------------
+//!      10011000000010000
+//! \endcode
+//!
+//! \subsection CRC_GENERIC_SECTION_TUTORIUM_BASIS_3_1 Das spezielle Dividieren der binären Polynome mit dem Rest (Schieb-Register Division)
+//!
+//! Da wir zum Dividiren der binären Polynome einen Ansatz vom Schieb-Register (SR) nutzen wollen, mussen wir auch mit den Unkosten rechnen. Denn für einen normalen Ablauf des SR-Prozesses sollen die Daten auf die Polynomlänge ausgerichten / erweitern werden. Anderes gesagt, statt der normalen (nativen) Polynomdivision berechnet der Schieb-Register immer einen Rest von einem modifizierten Datensatz wie folgt:
+//! 
+//! \f$R(X)=\left(P(X)\times X^{N}\right)\bmod G(X)\f$,
+//! 
+//! wo:\n
+//! \f$R\left(X\right)\f$ ein Restpolynom,\n
+//! \f$P\left(X\right)\f$ den Datensatz,\n
+//! \f$G\left(X\right)\f$ das Generatorpolynom,\n
+//! \f$N\f$ Ordnung des Generatorpolynomes \f$N=ord\left(G\right)\f$.
+//!
+//! Zum Beispiel, für einen Datensatz \f$P\left(X\right)=X^{16}+X^{13}+X^{12}+X^{4}\f$ wird der SR den Restpolynom von einem modifizierten Datensatz \f$P(X)\times X^{N}=X^{20}+X^{17}+X^{16}+X^{8}\f$ liefern\n
+//! vergleiche mit dem Beispiel aus \ref CRC_GENERIC_SECTION_TUTORIUM_ALGORITHM_1
+//! 
+//! \code{.txt}
+//! 100110000000100000000| 10011
+//! 10011                ---------------
+//! -----                  10000000000010011
+//!     00000
+//!     00000
+//!     -----
+//!         00001
+//!         00000
+//!         -----
+//!             10000
+//!             10011
+//!             -----
+//!                11000
+//!                10011
+//!                -----
+//!                 10110
+//!                 10011
+//!                 -----
+//! Rest:             101 = 0x5
+//!
+//! Prüfung:
+//!          10000000000010011
+//!         *            10011
+//!         ------------------
+//!          10000000000010011
+//!         10000000000010011
+//!      10000000000010011
+//!      ---------------------
+//!      100110000000100000101
+//! 
+//!      100110000000100000101
+//!   xor                  101
+//!      ---------------------
+//!      100110000000100000000
+//! \endcode
+//!
+//!
+//! \subsection CRC_GENERIC_SECTION_TUTORIUM_BASIS_4 CRC Verfahren
+//! Die Berechnung des CRC-Werts beruht auf Polynom Division: Die Folge
+//! der zu übertragenden Bits wird als binäres Polynom betrachtet. Beispiel:
+//! Die Bitsfolge \f$\left\{ 1,0,0,1,1,1,0,1\right\}\f$ entspricht dem Polynom
+//! \f$1\cdot X^{7}+0\cdot X^{6}+0\cdot X^{5}+1\cdot X^{4}+1\cdot X^{3}+1\cdot X^{2}+0\cdot X^{1}+1\cdot X^{0}=X^{7}+X^{4}+X^{3}+X^{2}+1\f$
+//!
+//! Anzahl der verschiedenen Polynomen von der Ordnung niedriger als \f$N\f$
+//! ist gleich \f$2^{N}\f$. Das ist die Anzahl aller Binären Folgen von Länge
+//! \f$N\f$.
+//! 
+//! Die Bitsfolge der Coderepräsentation der Daten wird durch ein vorher
+//! festzulegendes Generatorpolynom (das CRC-Polynom) \f$G\left(X\right)\f$
+//! \f$\bmod\left(2\right)\f$ geteilt, wobei ein Restpolynom \f$R\left(X\right)\f$
+//! bleibt. Dieser Rest ist eigentlich der gesuchte CRC-Wert.
+//! 
+//! \f$R(X)=\left(P(X)\times X^{N}\right)\bmod G(X)\f$,
+//! 
+//! wo:\n
+//! \f$R\left(X\right)\f$ ist ein Polynom, das den CRC-Wert repräsentiert.\n
+//! \f$P\left(X\right)\f$ ist das Polynom, dessen Koeffizienten die Datenbits
+//! sind.\n
+//! \f$G\left(X\right)\f$ ist das Generatorpolynom (das CRC-Polynom).\n
+//! \f$N\f$ ist die Ordnung des Generatorpolynomes \f$N=ord\left(G\right)\f$.
+//! 
+//! Multiplikation mit \f$X^{N}\f$ bedeutet, dass am Ende der Datenfolge
+//! \f$N\f$ Nullen zugefügt werden, das verbessert Qualität der Hashing für
+//! die kurzen Datenfolgen.
+//! 
+//! Bei der Übertragung/ Sendung der Daten hängt man den CRC-Wert an den
+//! originalen Datenblock an und überträgt/ sendet ihn modifiziert mit dem CRC-Wert am Ende:
+//! 
+//! \f$\widetilde{P}(X)=X^{N}\times P(X)+R(X)\f$.
+//! 
+//! Beim Teilen mit dem Rest des ursprünglichen Polynoms durch das Generatorpolynom
+//! \f$G\left(X\right)\f$ vom Grad \f$N\f$ kann man \f$2^{N}\f$ verschiedene Restwerte
+//! erhalten (für die Ordnung \f$N=32\f$ sind \f$4294967296\f$ Varianten für
+//! den CRC-Wert gegeben). Als Generatorpolynom \f$G\left(X\right)\f$ wählt
+//! man oft ein <i>irreduzibles</i> Polynom aus.
+//! 
+//! Um zu verifizieren, dass die Daten keinen Fehler beinhalten, wird
+//! der empfangene Datenblock mit angehängtem CRC-Wert als Binärfolge
+//! interpretiert, erneut durch das Generatorpolynom \f$G\left(X\right)\f$
+//! geteilt und der Rest ermittelt. Wenn kein Rest bleibt, ist entweder
+//! kein Fehler aufgetreten oder es ist ein (sehr unwahrscheinlicher)
+//! Fehler aufgetreten, der in Polynomdarstellung das CRC-Polynom als
+//! Faktor hat. Die Verifizierung ist auf dem folgenden Beweis basiert:\n
+//! \f$\widetilde{P}(X)\bmod G(X)=(X^{N}\times P(X)+R(X))\bmod G(X)\f$\n
+//! \f$=\left(X^{N}\times P(X)\right)\bmod G(X)+R(X)\bmod G(X)\f$\n
+//! \f$=R(X)+R(X)=2R(X)=0\f$
+//! 
+//! da \f$X^{N}\times P(X)\bmod G(X)=R(X)\f$, \f$R(X)\bmod G(X)=R(X)\f$.
+//!
+//! Für die spezielle SR-Division soll das oben beschriebene Verfahren
+//! ebenso gelten, da
+//! 
+//! \f$R=\left(P\times X^{N}\right)\bmod G\f$, das heißt es, gibt ein Polynom
+//! \f$D\f$, so \f$P\times X^{N}=D\times G+R\f$, weiter
+//! 
+//! seien \f$\widetilde{P}=P\times X^{N}+R\f$ modifizierte Daten, dann ergibt
+//! die CRC-Prüfung:
+//! 
+//! \f$\left[\widetilde{P}\times X^{N}\right]\bmod G=\left[\left(P\times X^{N}+R\right)\times X^{N}\right]\bmod G\f$\n
+//! \f$=\left[\left(P\times X^{N}\right)\times X^{N}\right]\bmod G+\left[R\times X^{N}\right]\bmod G\f$\n
+//! \f$=\left[\left(D\times G+R\right)\times X^{N}\right]\bmod G+\left[R\times X^{N}\right]\bmod G\f$\n
+//! \f$=\left[D\times G\times X^{N}\right]\bmod G+2\left[R\times X^{N}\right]\bmod G=0\f$,
+//! 
+//! da \f$D\times G\times X^{N}\f$ eine Vielfache vom \f$G\f$
+//! ist und soll \f$\left[D\times G\times X^{N}\right]\bmod G=0\f$, und \f$2\left[R\times X^{N}\right]\bmod G=0\f$.
+//!
+//! \section CRC_GENERIC_SECTION_TUTORIUM_ALGORITHM CRC Algorithmen
+//! - Direkter Verlauf (SR und LFSR).
+//! - Rückwärts Verlauf (SR und LFSR).
+//! - Direkter Verlauf auf Tabellenbasis LUT (SR und LFSR).
+//! - Rückwärts Verlauf auf Tabellenbasis LUT (SR und LFSR).
+//! \.
+//!
+//! \subsection CRC_GENERIC_SECTION_TUTORIUM_ALGORITHM_1 Direkter Verlauf (Direct Straightforward SR and LFSR Algorithms)
+//! Für die Beschreibung der Algorithmen müssen wir einige Vereinbarungen treffen.
+//! 
+//! Erstens, wir sollen eine eigene Realisierung für Dividieren der binären Zahlenfolgen (Polynome) mit dem Rest schaffen, da uns die standarten Operationen mit den binären Zahlenfolgen nicht ausreichend sind. Wir brauchen eigenartige Operationen der polynomischen Arithmetik modulo 2. Um CRC Dividieren umzusetzen, müssen wir einen Datenblock Schritt für Schritt durch einer Division-Register schieben.
+//! 
+//! Zweitens, ohne Beschränkung der Allgemeinheit betrachten wir die Funktionalität eines 8-Bits Registers und wählen das Polynom der 8-ten Ordnung, also. Zum Beispiel, sei ein CRC-8 Generator mit der Signatur: 111010101 vorgegeben. So sieht der Division-Register schematisch aus:
+//! \image html Division-Register.png
+//! Algorithmus Beschreibung:
+//! 
+//! - Schritt 1. Der Register wird vor der Berechnung mit den Nullen initialisiert (Initialisierungswert kann auch einen bestimmten Wert (nicht immer Null) sein. Für die weiteren Details siehe die Tabelle: Gängige Polynome und Typen)
+//! - Schritt 2. Zum Ende des Bits-streams werden Null Bits zugefügt.
+//! - Schritt 3. In einer Schleife (mit Bedingung: es noch unbearbeitete Bits gibt) schieben wir den Register auf einen Bit links, dabei kommt ein unbearbeiteter Bit in die Registerstelle 0.
+//! - Schritt 4. Wenn eine "1" aus dem Register geschoben wird, soll der Register mit dem  Polynom (Register XOR Polynom) XOR-odert werden. Sonst kehrt der Prozess zum Schritt 3 zurück.
+//! - Schritt 5. Wenn es keinen Daten-Bit mehr gibt, enthält der Register den gesuchten Restwert.
+//! \.
+//!
+//! \image html "Direct Straightforward SR Algorithm.png"
+//!
+//! <b>CRC-Algorithm with the linear feedback shift register</b>
+//!
+//! For the purposes of example, consider a polynom of the order 4 and
+//! the polynom = 10111 (0x7). Then, the perform the division, we need to use a 4-bit
+//! register:
+//!
+//! \code{.txt}
+//! 
+//!      +-----< Data (non augmented)               Algorithm
+//!      |                                          ---------
+//!      v         3    2    1    0   Bits          1. Shift the register left by
+//!      |      +----+----+----+----+                  one bit, reading in a new
+//!     XOR----<|    |    |    |    | LF-Register      data bit.
+//!             +----+----+----+----+               2. XOR the top bit just rotated
+//!                       ^                            out of the register with the
+//!                       |                            next data bit, if XOR != 1
+//!  if(XOR==1) Register XOR Polynom                   then goto 1.
+//!                       |                         3. XOR the polynomial into the
+//!              ---------+----------                  register.
+//!          (1)   0    1    1    1   Polynom       4. Goto 1 iff more augmented
+//!                                                    data bits.
+//! \endcode
+//!
+//! The following block diagram shows the principle of the LFSR-Algorithm.
+//!
+//! \image html CRC-Generic_algorithmLFSR.png "CRC-Algorithm with the linear feedback shift register"
+//!
+//! <b>Ein Beispiel demonstriert die Arbeit des LF-SR Processes</b>
+//!
+//! \f$[(X^{16}+X^{13}+X^{12}+X^{4})\times X^{4}]\bmod(X^{4}+X^{1}+X^{0})=X^{2}+X^{0}\f$
+//!
+//! (vergleiche mit dem Beispiel aus \ref CRC_GENERIC_SECTION_TUTORIUM_BASIS_3_1)
+//!
+//! \code{.txt}
+//! Datensatz: P(x) = x^16 + x^13 + x^12 + x^4 = (10011000000010000)
+//! Generator Polynom: G(x) = x^4 + x + 1 = (10011)
+//! Normal reciprocal Polynom: 11 = 0x3
+//!
+//! Algoritm Directly LF-SR:
+//! 
+//!        Data                Register
+//! -------------------        ------
+//! 0|10011000000010000  <<   0|0000 = 0x0
+//! *1|0011000000010000  <<   0|0000        1 xor 0 = 1
+//!                         xor 0011 (Polynom)
+//!                             ----
+//!                             0011 = 0x3
+//!   0|011000000010000  <<   0|0110 = 0x6
+//!    0|11000000010000  <<   0|1100 = 0xC
+//!     1|1000000010000  <<   1|1000 = 0x8  1 xor 1 = 0
+//!      1|000000010000  <<   1|0000 = 0x0  1 xor 1 = 0
+//!       0|00000010000  <<   0|0000 = 0x0
+//!        0|0000010000  <<   0|0000 = 0x0
+//!         0|000010000  <<   0|0000 = 0x0
+//!          0|00010000  <<   0|0000 = 0x0
+//!           0|0010000  <<   0|0000 = 0x0
+//!            0|010000  <<   0|0000 = 0x0
+//!             0|10000  <<   0|0000 = 0x0
+//!             *1|0000  <<   0|0000        1 xor 0 = 1
+//!                         xor 0011 (Polynom)
+//!                             ----
+//!                             0011 = 0x3
+//!               0|000  <<   0|0110 = 0x6
+//!                0|00  <<   0|1100 = 0xC
+//!                 0|0  <<  *1|1000        0 xor 1 = 1
+//!                         xor 0011 (Polynom)
+//!                             ----
+//!                             1011 = 0xB
+//!                  0|  <<  *1|0110        0 xor 1 = 1
+//!                         xor 0011 (Polynom)
+//!                             ----
+//!                              101 = 0x5  Rest
+//! \endcode
+//!
+//! <b>Direct Straightforward CRC-Verlauf mit Schiebe-Register (SR) C-Implementierung</b>\n
+//! Bei der einfachen Schiebe-Register C-Implementierung, müssen die Daten ebenso mit 0-en erweitert werden, um die CRC-Berechnung abzuschließen. Das Erweitern wird bereits in der Funktion durchgeführt (letzte for-Schleife).
+//!
+//! <b>Direct Straightforward CRC-Verlauf LFSR C-Implementierung</b>\n
+//! Bei der Linear-Feedback-Shift-Register (LFSR) C-Implentierung müssen nur die Eingangsbits, ohne weitere 0en, verarbeitet werden. Aufgrund dieser Zeitersparniss, wird üblicherweise dieser Algorithmus verwendet.
+//!
+//! \subsection CRC_GENERIC_SECTION_TUTORIUM_ALGORITHM_2 Rückwärts Verlauf (Reversed Straightforward Algorithm)
+//! Der Algorithmus funktioniert genauso wie Direkter Verlauf mit einem Unterschied, dass man
+//! - einen reflektierten Register und ein reflektiertes Polynom verwenden soll.
+//! - Der Initiierungswert des Registers ist das gleiche wie im vorherigen Algorithmus, mit einem Unterschied, dass er reflektiert ist.
+//! - Die Byte-Strom wird in der gleichen Reihenfolge eingelesen wie zuvor verarbeitet (d.h. die Daten selbst nicht reflektiert werden).
+//! - Die Bytes aus den Daten müssen selbst nicht explizit reflektiert werden, denn wir verwenden schon ein reflektiertes CRC- Modell.
+//!
+//! \note
+//! Wichtig! Am Ende der Verlauf enthält der Register den gesuchten CRC-Rest (CRC-Prüfwert) in reflektierten Form.
+//!
+//! Für weitere Details siehe \ref CRC_GENERIC_SECTION_TUTORIUM_ALGORITHM_4.
+//! \image html "Reversed Straightforward SR Algorithm.png"
+//! Rückwärts CRC-Verlauf LFSR C-Implementierung\n
+//! Werden die Daten mit LSB zuerst übertragen, so ist es sinnvoll die umgekehrte Implementierung zu verwenden. Die einfache Schiebe-Register-Implementierung, welche wiederum die abschließenden 0en benötigen würde, wird üblicherweise auch nicht verwendet.
+//!
+//! \subsection CRC_GENERIC_SECTION_TUTORIUM_ALGORITHM_3 Direkter Verlauf auf Tabellenbasis (Direct Forward Lookup Table Algorithm)
+//! Direkter Straightforward Algorithmus basiert sich auf der polynomischen Arithmetik, aber er ist  in C schlecht implementierbar (wegen Bits-weise Verarbeitung) und auch nicht effizient. Deswegen verwendet man andere Arten der Algorithmen, die auf einen ganzen Datenblock (Byte, etc.) greifen. Als Datenblock können die Nibbles (4 bits), Bytes (8 bits), Words (16 bits), Double Word (32 bits), Quadruple Word (64 bits) oder Double Quadruple Word (128 bits) betrachtet werden.
+//!
+//! Die Tabellen Implementierung nutzt die Eigenschaft aus, dass die XOR-Verknüpfungen zusammengelegt werden können. Die heißt die assoziative Eigenschaft der Operation XOR. Statt dem Ausdruck \f$((A xor B) xor C)\f$ kann auch der Ausdruck \f$(A xor (B xor C))\f$ berechnet werden. Somit können mehrere XOR-Verknüpfungen zusammengefasst und diese auf einmal abgearbeitet werden. Die zusammengefassten XOR-Verknüpfungen werden in Tabellen abgelegt.
+//!
+//! \code{.txt}
+//! 0 1 0 1 1 1 0 0 0 0 0 0 0 0 0 0 : 1 0 0 1 1 0 0 1 0 
+//! 0 0 0 0 0 0 0 0 0 (XOR)
+//! -------------------
+//!   1 0 1 1 1 0 0 0 0 (XOR)
+//!   1 0 0 1 1 0 0 1 0
+//!   ------------------- 
+//!     0 1 0 0 0 0 1 0 0 
+//! 
+//! 
+//! 0 1 0 1 1 1 0 0 0 0 0 0 0 0 0 0 : 1 0 0 1 1 0 0 1 0 
+//! 0 0 0 0 0 0 0 0 0 (XOR)
+//!   1 0 0 1 1 0 0 1 0 (XOR)
+//! --------------------- 
+//!     0 1 0 0 0 0 1 0 0
+//! \endcode
+//!
+//! Bei diesem Vergleich sieht man, dass die ersten zwei Bits die XOR-Verknüpfung für die nächsten Bits vorgeben. Die Anzahl der zusammengefassten Bits kann je nach verfügbarem Speicher ausgewählt werden. Sinnvolle werte sind 2, 4, 8 Bits. Größere Werte als 8 machen nur Sinn, wenn die Eingangsdaten nicht ein vielfaches eines Bytes sind.
+//!
+//! Für die Demonstrationszwecken betrachten wir ein Polynom von 32-er Ordnung. Der Register besteht jetzt aus 4 Zellen \f$(b_0 b_1 b_2 b_3)\f$, jede Zelle enthält genau ein Byte (8 Bits).
+//!
+//! Der Algorithmus:
+//! - 1. Schritt. Eine Verschiebung des Registers links auf 1 Byte und Ergänzen des Registers mit einem neuen Byte aus dem Byte-Stream. 
+//! - 2. Schritt. Das verschobene aus dem Register Byte wird als Tabellenschlüssel verwendet. In der Tabelle sind bereits 256 32-Bits Datensätze gespeichert. 
+//! - 3. Schritt. Der Register wird mit dem neun Wert (Register XOR Tabellensatz) modifiziert.
+//! - 4. Schritt. Wenn es noch Daten gibt, geh zu dem 1. Schritt. 
+//! \.
+//! 
+//! \image html Table-Driven.png
+//! \image html "Direct Forward LUT Algorithm.png"
+//!
+//! <b>CRC-Algorithm LF-SR with the lookup table</b>
+//! 
+//! For the purposes of example, let us switch from a 4-bit poly to a
+//! 32-bit one (CRC32). Our register looks much the same, except the boxes
+//! represent bytes instead of bits, and the Poly is 33 bits (one implicit
+//! 1 bit at the top and 32 "active" bits).
+//!
+//! \code{.txt}
+//!          +-----< Data (non augmented)
+//!          |
+//!          v         3    2    1    0   Bytes
+//!          |      +----+----+----+----+
+//!         XOR----<|    |    |    |    | LF-Register
+//!          |      +----+----+----+----+
+//!          |                ^
+//!          |                |
+//!          |               XOR
+//!          |                |           LUT
+//!          |     0+----+----+----+----+       Algorithm
+//!          v      +----+----+----+----+       ---------
+//!          |      +----+----+----+----+       1. Shift the register left by
+//!          |      +----+----+----+----+          one byte, reading in a new
+//!          |      +----+----+----+----+          data byte.
+//!          |      +----+----+----+----+       2. XOR the top byte just rotated
+//!          |      +----+----+----+----+          out of the register with the
+//!          +----->+----+----+----+----+          next data byte to yield an
+//!                 +----+----+----+----+          index into the table ([0,255]).
+//!                 +----+----+----+----+       3. XOR the table value into the
+//!                 +----+----+----+----+          register.
+//!                 +----+----+----+----+       4. Goto 1 iff more augmented
+//!              255+----+----+----+----+          data bytes.
+//! \endcode
+//!
+//! The following block diagram shows the principle of the LUT-Algorithm LF-SR.
+//!
+//! \image html CRC-Generic_LUTprocess.png "CRC-Algorithm LF-SR with the lookup table"
+//!
+//! \subsection CRC_GENERIC_SECTION_TUTORIUM_ALGORITHM_4 Rückwärts Verlauf auf Tabellenbasis (Reversed Lookup Table Algorithm)
+//! Bei der (Bytes-) Datenumtausch auf Hardware Ebene benutzt man verschiedene Bit-Reihenfolgen mit den bestimmten Bitwertigkeiten. Dabei unterscheidet man zwischen MSB (<i>most significant bit</i>) und LSB (<i>least significant bit</i>) Bitnummerierung.
+//! 
+//! Die MSB Bit-Reihenfolge. Die höchstwertige Bitposition innerhalb einer Binärzahl ist diejenige mit dem höchsten Stellenwert. Ist bei einer Binärzahl mit den Stellen \f$0,1,...,N-1\f$ das Bit 0 das höchstwertige, dann ist sein Wert mit \f$2^{N-1}\f$ zu multiplizieren. Der Gesamtwert der Binärzahl ist: \f$\sum^{N-1}_{i=0} a_i \cdot 2^{N-1-i}\f$
+//!
+//! Die der MSB Bit-Reihenfolge. Die niedrigstwertige Bitposition innerhalb einer Binärzahl ist diejenige mit dem niedrigsten Stellenwert. Ist bei einer Binärzahl mit den Positionen \f$0,1,...,N-1\f$ die Bitposition 0 die niedrigstwertige, dann ist deren Wert mit 1 zu multiplizieren. Der Gesamtwert der Binärzahl ist: \f$\sum^{N-1}_{i=0} a_i \cdot 2^{i}\f$
+//!
+//! <b>Definition:</b> Ein Datenwert oder ein Register heißt reflected, wenn alle seinen Bit-Stellen um das Zentrum gespiegelt waren. Zum Beispiel: der Wert 0111 0101 1010 1111 0010 0101 1011 1100 ist reflektierend gegen den Wert 0011 1101 1010 0100 1111 0101 1010 1110 .
+//!
+//! Wie man sieht, die oben beschriebenen Algorithmen (Direct Straightforward- und Direct Table Algorithm) arbeiten mit dem MSB Format. Für den LSB Format ist sinnvoll (wegen der Optimierungszwecke) die anderen (Reversed) Algorithmen zu verwenden. Dabei werden den Datenstrom wie oben von vorne eingespeist.
+//!
+//! Sei das CRC- Modell wie oben. Wir betrachten ein Polynom von 32-er Ordnung. Der Register besteht jetzt aus 4 Zellen (), jede Zelle enthält genau ein Byte.
+//!
+//! <b>Bemerkungen:</b>
+//! - Die Tabelle ist identisch zu der, die im vorhergehenden Algorithmus verwendet wird, mit einer Ausnahme, dass jeder Tabelleneintrag reflektiert wird.
+//! - Der Initiierungswert des Registers ist das gleiche wie im vorherigen Algorithmus, mit dem Unterschied, dass er reflektiert ist.
+//! - Die Byte-Strom wird in der gleichen Reihenfolge eingelesen wie zuvor verarbeitet (d.h. die Daten selbst nicht reflektiert werden).
+//! - Die Bytes aus den Daten müssen selbst nicht explizit reflektiert werden, denn wir verwenden schon ein reflektiertes CRC- Modell.
+//! \.
+//!
+//! \image html "Reflected Table-Driven.png"
+//!
+//! \note
+//! Wichtig! Zum Ende der Verlauf enthält der Register eine Reflexion des gesuchten CRC-Rests (CRC-Prüfwert).
+//!
+//! \image html "Reversed LUT Algorithm.png"
+//!
