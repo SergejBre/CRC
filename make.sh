@@ -202,6 +202,15 @@ gcc   -o CRC_dynamic_tests tests.o $LINK_LIB_DIN
 gcc   tests.c -pg -o CRC_profiling -pipe -Os -Wall -W -fPIE $LINK_LIB_STAT
 rm    tests.o
 
+#build examples
+echo  "Compile and build the Examples"
+echo  "build CRC_generic_examples*"
+cd    ..
+cd    tut
+gcc   -c $CFLAGS examples*.c
+gcc   -o CRC_generic_examples01 examples.o examples01.o $LINK_LIB_DIN
+rm    *.o
+
 cd    ..
 
 exit 0
