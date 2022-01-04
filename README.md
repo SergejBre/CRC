@@ -150,9 +150,13 @@ The following directories and files are part of the CRC-Generic library:
     |
     +--/tst (Tests to the CRC-Generic project, directory for tests files)
     |     |
+    |     +--crc_tests_pages.dox (doxygen page for Tests)
+    |     |
     |     +--tests.c (source file for Unit-Test)
     |
     +--/tut (Tutorial to the CRC-Generic project)
+    |     |
+    |     +--crc_tutorium_pages.dox (doxygen page for Tutorial)
     |     |
     |     +--examples.h (head file for Examples)
     |     |
@@ -571,7 +575,7 @@ For the detailed API documentation, follow link - [![Docs Doxygen](https://img.s
 [![Top](https://img.shields.io/badge/back%20to%20top-%E2%86%A9-blue)](#Contents)
 ____
 ## Tutorium for CRC Generic library
-TODO
+To go to the tutorial page for applying the CRC library, follow the link - [Tutorium](https://sergejbre.github.io/CRC/doc/html/tutorial.html)
 
 [![Top](https://img.shields.io/badge/back%20to%20top-%E2%86%A9-blue)](#Contents)
 ____
